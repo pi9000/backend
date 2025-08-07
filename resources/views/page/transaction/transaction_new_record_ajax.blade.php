@@ -157,10 +157,13 @@
                                         </a>
                                     </td>
                                     <td class="no-padding">
-                                        <a href="javascript:void(0)" data-toggle="modal" data-target="#reject"
+                                        <a href="{{ url('transactions/instant_transaction/reject/' . $item->trx_id) }}?amount={{ $item->total }}&type={{ $item->transaksi }}"
+                                            data-msg="Are you sure you want to reject this transaction?"
+                                            value="Confirm"
                                             class="waves-effect waves-light btn btn-danger btn-sm btn-block btn-rounded"
-                                            style="font-weight: 500"
-                                            onclick="showModal('{{ url('transactions/instant_transaction/rejects/' . $item->trx_id) }}?amount={{ $item->total }}&type={{ urlencode($item->transaksi) }}', '.modal-lg', '#reject')">Reject</a>
+                                            style="font-weight: 500">
+                                            Reject
+                                        </a>
                                     </td>
                                 </tr>
                             @endforeach
