@@ -71,7 +71,7 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td style="width:200px">Max Claim : <span class="text-danger">*</span>
+                                        <td style="width:200px">Maximum Bonus : <span class="text-danger">*</span>
                                         </td>
                                         <td colspan="3">
 
