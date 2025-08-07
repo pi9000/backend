@@ -27,7 +27,7 @@
                                         <th class="text-center"> Upline Ref ID </th>
                                         <th class="text-center"> Ref No</th>
                                         <th class="text-center"> Fund Method </th>
-
+                                        <th class="text-center"> Bonus </th>
                                         <th class="text-center"> Status</th>
                                         <th class="text-center"> Receipt</th>
                                         <th class="text-center"> Debit </th>
@@ -92,6 +92,9 @@
                                                 {{ $item->metode }}
                                             </td>
                                             <td class="text-center">
+                                                {{ $item->bonus != 'tanpabonus' ? $item->bonuse->judul : '' }}
+                                            </td>
+                                            <td class="text-center">
                                                 @if ($item->status == 'Sukses')
                                                     <span class="label label-success">Confirmed</span>
                                                 @else
@@ -129,6 +132,7 @@
                                 </tbody>
                                 <tfoot>
                                     <tr>
+                                        <th colspan=""></th>
                                         <th colspan=""></th>
                                         <th colspan=""></th>
                                         <th colspan=""></th>
@@ -181,7 +185,7 @@
     $(document).ready(function() {
         let d_table = null;
         window.trans_record = Array.from({
-            length: 14
+            length: 15
         }, (_, i) => i); // <== 0 sampai 15
 
         function preset_filter() {

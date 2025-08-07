@@ -47,6 +47,7 @@
                                 <th class="text-center">Username</th>
                                 <th class="text-center" style="width: 50px">Ref No</th>
                                 <th class="text-center">Fund Method</th>
+                                <th class="text-center"> Bonus </th>
                                 <th class="text-center">Status</th>
                                 <th class="text-center">Receipt</th>
                                 <th class="text-center td_debit">Debit</th>
@@ -110,6 +111,9 @@
                                         @endif
                                     </td>
                                     <td class="text-center">{{ $item->metode }}</td>
+                                    <td class="text-center">
+                                        {{ $item->bonus != 'tanpabonus' ? $item->bonuse->judul : '' }}
+                                    </td>
                                     <td class="text-center">
                                         <span class="label label-warning">In Progess</span>
 
@@ -335,7 +339,7 @@
                     visible: false
                 },
                 {
-                    targets: 13,
+                    targets: 14,
                     orderable: false
                 },
             ],

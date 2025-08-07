@@ -39,7 +39,7 @@
                                             @if ($data->status == 'Ditolak')
                                                 <strike>{{ number_format($data->total, 2) }}</strike>
                                             @else
-                                                <strike>{{ number_format($data->total, 2) }}</strike>
+                                                {{ number_format($data->total, 2) }}
                                             @endif
                                         </td>
                                     </tr>
