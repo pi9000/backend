@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'livechat_problem' => 'Have any problem? Live Chat',
+    'livechat' => 'Live Chat',
+    'welcomemsg' => 'Welcome Agent',
+    'creditlabel' => 'Current Credit',
+    'notification' => 'Notification',
+    'instant_transaction' => 'Instant Transaction',
+    '__instant_depo' => 'Deposit',
+    '__instant_withd' => 'Withdraw',
+    '__promo' => 'Promotion Release',
+    '__bonus' => 'Bonus Release',
+    '__action' => 'Action Log',
+    '__referral_activation' => 'Referral Activation',
+    'viewprofile' => 'View Profile',
+    'agent' => 'Agent',
+    'logout' => 'Logout',
+    'timezone' => 'TIME ZONE',
+    'instant_transactions' => 'Instant Transaction',
+    'instant_transactions' => 'Instant Transaction',
+    'instant_transactions' => 'Instant Transaction',
+    'instant_transactions' => 'Instant Transaction',
+    'instant_transactions' => 'Instant Transaction',
+];
