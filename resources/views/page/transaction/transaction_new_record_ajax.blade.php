@@ -112,7 +112,7 @@
                                     </td>
                                     <td class="text-center">{{ $item->metode }}</td>
                                     <td class="text-center">
-                                        {{ $item->bonus != 'tanpabonus' ? $item->bonuse->judul : '' }}
+                                        {{ $item->bonus != 'tanpabonus' ? number_format($item->bonus_amount,2) : '' }}
                                     </td>
                                     <td class="text-center">
                                         <span class="label label-warning">In Progess</span>
