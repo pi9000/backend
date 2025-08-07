@@ -473,21 +473,21 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td style="width:150px">Apikey / Agent Code</td>
+                                        <td style="width:150px">{{ $item->provider == 'NexusGGR' ? 'Agent Code' : 'Secure Login' }}</td>
                                         <td colspan="3">
                                             <input style="width:500px" type="text" class="" id="apikey" name="apikey"
                                                 value="{{ $item->apikey }}" required>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td style="width:150px">Token / SecretKey</td>
+                                        <td style="width:150px">{{ $item->provider == 'NexusGGR' ? 'Agent Token' : 'Secret Key' }}</td>
                                         <td colspan="3">
                                             <input style="width:500px" type="text" class="" id="secretkey"
                                                 name="secretkey" value="{{ $item->secretkey }}" required>
                                         </td>
                                     </tr>
-                                    <tr>
-                                        <td style="width:150px">Secretkey 2</td>
+                                    <tr {{ $item->provider == 'NexusGGR' ? '' : 'style="display:none;"' }}>
+                                        <td style="width:150px">{{ $item->provider == 'NexusGGR' ? 'Secret Key' : 'Agent Code' }}</td>
                                         <td colspan="3">
                                             <input style="width:500px" type="text" class="" id="agentcode"
                                                 name="agentcode" value="{{ $item->agentcode }}" required>
