@@ -70,7 +70,7 @@ class MasterController extends Controller
         $user->username    = $request->username;
         $user->email    = $request->email;
         $user->password    = Hash::make($request->password);
-        $user->secure_pin = Hash::make(000000);
+        $user->secure_pin = Hash::make('000000');
         $user->balance    = $request->balance;
         $user->currency    = auth()->user()->currency;
         $user->status    = 1;
