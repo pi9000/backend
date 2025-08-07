@@ -18,7 +18,7 @@
                 <div class="card shadow">
                     <div class="card-body">
                         <div class="row mt-3">
-                            <div class="col-md-12 ">
+                            <div class="col-md-12 table-responsive">
                                 <table class="table table-bordered table-hover tright text-center medium table-css"
                                     id="results" style="table-layout:fixed;width: 100%;">
                                     <thead>
@@ -26,7 +26,7 @@
                                             <th class="middle" style="max-width:20px;"> # </th>
                                             <th class="middle" style="width:100px;"> Brand ID </th>
                                             <th class="middle"> Action </th>
-                                            <th class="logs" style="width:180px;"> Logs </th>
+                                            <th class="logs" style="width:100px;"> Logs </th>
                                             <th class="middle"> By Agent </th>
                                             <th class="middle"> IP Address </th>
                                             <th class="middle"> Country </th>
