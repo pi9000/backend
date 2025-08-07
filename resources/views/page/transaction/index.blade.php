@@ -352,7 +352,7 @@
 
 
         $(document).ready(function() {
-            var all_filter_index = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13'];
+            var all_filter_index = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13','14'];
             window.options = all_filter_index;
             c_count = 0;
             setInterval(() => {
