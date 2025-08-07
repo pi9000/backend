@@ -110,8 +110,8 @@ Route::controller('TransactionController')->middleware(['auth', 'verify'])->grou
     Route::get('transactions/instant_transaction/rejects/{id}', 'instant_transaction_reject')->name('transactions.instant_transaction_reject')->middleware('permission:chkbox_rejecttrans');
     Route::any('transactions/instant_transaction/reject/{id}', 'instant_transaction_reject_action')->name('transactions.instant_transaction_reject_action')->middleware('permission:chkbox_rejecttrans');
     Route::any('transactions/instant_transaction/confirm/{id}', 'instant_transaction_approve')->name('transactions.instant_transaction_approve')->middleware('permission:chkbox_apptrans');
-    Route::get('transactions/instant_transaction/multi_reject_form', 'multi_reject_form')->name('transactions.multi_reject_form')->middleware('permission:sub_sidebar.chkbox_rejecttrans');
-    Route::get('transactions/instant_transaction/multi_confirm', 'multi_reject_form')->name('transactions.multi_reject_form')->middleware('permission:chkbox_apptrans');
+    // Route::get('transactions/instant_transaction/multi_reject_form', 'multi_reject_form')->name('transactions.multi_reject_form')->middleware('permission:sub_sidebar.chkbox_rejecttrans');
+    // Route::get('transactions/instant_transaction/multi_confirm', 'multi_confirm')->name('transactions.multi_reject_form')->middleware('permission:chkbox_apptrans');
     Route::get('transactions/instant_transaction/{id}', 'transaction_details')->name('transactions.transaction_details')->middleware('permission:sub_sidebar.Transactions.Transaction');
 
     Route::any('transactions/transaction_new_record_ajax', 'transaction_new_record_ajax')->name('transactions.getTransactionHistory')->middleware('permission:sub_sidebar.Transactions.Transaction');

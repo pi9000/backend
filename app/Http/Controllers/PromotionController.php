@@ -62,6 +62,7 @@ class PromotionController extends Controller
             'max_claim' => $request->max_claim,
             'bonus_type' => $request->bonus_type,
             'status' => $request->status,
+            'to' => $request->to,
             'type' => $request->type,
             'sequence' => $request->sequence,
         ];
