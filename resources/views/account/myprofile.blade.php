@@ -303,7 +303,7 @@
                                 <td class="table-light">App Logo</td>
                                 <td class="_app_logo">
                                     @if(auth()->user()->logo != null)
-                                    <img src="{{ env('AWS_URL') }}AppBrandLogo/{{ auth()->user()->logo }}" class="img-thumbnail" width="100px" />
+                                    <img src="{{ auth()->user()->logo }}" class="img-thumbnail" width="100px" />
                                     @else
                                     <span class="text-secondary">No Image</span>
                                     @endif
@@ -365,7 +365,7 @@
                                 <td class="table-light">App Favicon</td>
                                 <td class="_app_logo">
                                     @if(auth()->user()->favicon != null)
-                                    <img src="{{ env('AWS_URL') }}AppBrandLogo/{{ auth()->user()->favicon }}" class="img-thumbnail" width="60px" />
+                                    <img src="{{ auth()->user()->favicon }}" class="img-thumbnail" width="60px" />
                                     @else
                                     <span class="text-secondary">No Image</span>
                                     @endif

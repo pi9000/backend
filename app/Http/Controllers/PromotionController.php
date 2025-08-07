@@ -54,7 +54,7 @@ class PromotionController extends Controller
         $params = [
             'agent_id' => auth()->user()->agent_id,
             'judul' => $request->judul,
-            'file' => $file_name,
+            'file' => config('filesystems.disks.s3.url') . $file_name,
             'deskripsi' => $request->deskripsi,
             'minimal_depo' => $request->minimal_depo,
             'bonus' => $request->bonus,

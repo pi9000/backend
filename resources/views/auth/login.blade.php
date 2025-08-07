@@ -72,7 +72,7 @@
         <div class="row page-titles">
             <section class="centered {{ setting()->brand_name }}">
 
-                <img src="{{ env('AWS_URL') }}{{ setting()->logo }}" alt="homepage"
+                <img src="{{ setting()->logo }}" alt="homepage"
                     class="img-fluid center-block animated fadeInDown m_logo" />
 
                 <div class="login-box card animated fadeInUp border">

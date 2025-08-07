@@ -113,7 +113,7 @@
                                                 </td>
                                                 <td>
                                                     @if ($item->gambar != null)
-                                                        <img src="{{ env('AWS_URL') }}{{ $item->gambar }}"
+                                                        <img src="{{ $item->gambar }}"
                                                             class="img-thumbnail" width="250px" />
                                                     @else
                                                         <span class="text-secondary">No Image</span>

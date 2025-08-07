@@ -139,9 +139,9 @@ class ProfileController extends Controller
         );
         $user = Admin::find(auth()->user()->id);
         if ($request->title == 'favicon') {
-            $user->favicon = $file_name;
+            $user->favicon = config('filesystems.disks.s3.url') . $file_name;
         } else {
-            $user->logo = $file_name;
+            $user->logo = config('filesystems.disks.s3.url') . $file_name;
         }
         $user->save();
 

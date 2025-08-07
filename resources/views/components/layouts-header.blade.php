@@ -11,7 +11,7 @@
 <!-- Favicon icon -->
 
 @if(applogo()->favicon != NULL)
-<link rel="icon" type="image/png" sizes="16x16" href="{{ env('AWS_URL') }}{{ applogo()->favicon }}">
+<link rel="icon" type="image/png" sizes="16x16" href="{{ applogo()->favicon }}">
 @endif
 <title>{{ setting()->title }}</title>
 

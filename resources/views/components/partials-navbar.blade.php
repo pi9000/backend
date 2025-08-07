@@ -50,9 +50,9 @@
             <!-- ============================================================== -->
             <div class="px-2 text-left">
                 <a class="navbar-brand" href="{{ route('index') }}">
-                    <img src="{{ env('AWS_URL') }}{{ applogo()->logo }}" alt="homepage" class="img-fluid"
+                    <img src="{{ applogo()->logo }}" alt="homepage" class="img-fluid"
                         style="min-width:100px; max-height:45px;" />
-                    <!-- <img src="{{ env('AWS_URL') }}{{ applogo()->logo }}"
+                    <!-- <img src="{{ applogo()->logo }}"
                 alt="homepage" class="img-fluid" style="min-width:100px; max-height:60px;" /> -->
                 </a>
             </div>

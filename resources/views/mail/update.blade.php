@@ -30,7 +30,7 @@
                 <tbody>
                     <tr>
                         <td style="vertical-align: top; padding-bottom: 30px" align="center">
-                            <img src="{{ env('AWS_URL') }}{{ $logo }}" alt="{{ $title }}" style="border: none" width="255" />
+                            <img src="{{ $logo }}" alt="{{ $title }}" style="border: none" width="255" />
                         </td>
                     </tr>
                 </tbody>
