@@ -51,8 +51,8 @@
             <th> Bank / Method</th>
             <th> Status </th>
             <th> Transaction By </th>
-            <th> Debit </th>
-            <th> Credit </th>
+            <th> Deposit Amt </th>
+            <th> Withdraw Amt </th>
         </tr>
     </thead>
     <tbody>
