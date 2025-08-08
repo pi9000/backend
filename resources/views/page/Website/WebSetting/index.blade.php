@@ -2,11 +2,11 @@
 @section('panel')
 <style>
     /* .container-fluid {
-                                                        max-width: 1170px;
-                                                        } */
+                                                            max-width: 1170px;
+                                                            } */
     /* .newTmpl{
-                                                        background-color:#f9f6f6;
-                                                        } */
+                                                            background-color:#f9f6f6;
+                                                            } */
     .card {
         width: 100% !important;
     }
@@ -333,6 +333,46 @@
                                         </td>
                                     </tr>
 
+                                    @if (auth()->user()->brand_id == 2)
+                                    <tr class=" newTmpl" style="line-height: 2.5;">
+                                        <td style="width:150px">Website Style (New) : <span class="text-danger">*</span>
+
+                                        </td>
+                                        <td colspan="3">
+                                            <div style="float:left">
+                                                <select id="websiteStyles2" name="web_styles" style="width:500px"
+                                                    required>
+                                                    <option value="">Please Choose</option>
+                                                    <option value="style" {{ $data->web->warna == 'style' ? 'selected' : ''}}>
+                                                        One Night </option>
+                                                    <option value="style2" {{ $data->web->warna == 'style2' ? 'selected' :
+                                                        ''}}> Green </option>
+                                                    <option value="style3" {{ $data->web->warna == 'style3' ? 'selected' :
+                                                        ''}}> Dark Purple </option>
+                                                    <option value="style4" {{ $data->web->warna == 'style4' ? 'selected' :
+                                                        ''}}> Ash </option>
+                                                    <option value="style5" {{ $data->web->warna == 'style5' ? 'selected' :
+                                                        ''}}> Pink </option>
+                                                    <option value="style7" {{ $data->web->warna == 'style7' ? 'selected' :
+                                                        ''}}> Black </option>
+                                                    <option value="style14" {{ $data->web->warna == 'style14' ? 'selected' :
+                                                        ''}}> Red </option>
+                                                    <option value="style15" {{ $data->web->warna == 'style15' ? 'selected' :
+                                                        ''}}> Red2 </option>
+                                                    <option value="style25" {{ $data->web->warna == 'style25' ? 'selected' :
+                                                        ''}}> Brown </option>
+                                                    <option value="style10" {{ $data->web->warna == 'style10' ? 'selected' :
+                                                        ''}}> Black 2 </option>
+                                                    <option value="style30" {{ $data->web->warna == 'style30' ? 'selected' :
+                                                        ''}}> Pink 2 </option>
+                                                </select>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    @else
+                                    <input type="hidden" name="web_styles" value="{{ $data->web->warna }}">
+                                    @endif
+
                                     <tr>
                                         <td style="width:150px">Tutorial Register Videos:</td>
                                         <td colspan="4">
@@ -473,21 +513,25 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td style="width:150px">{{ $item->provider == 'NexusGGR' ? 'Agent Code' : 'Secure Login' }}</td>
+                                        <td style="width:150px">
+                                            {{ $item->provider == 'NexusGGR' ? 'Agent Code' : 'Secure Login' }}
+                                        </td>
                                         <td colspan="3">
                                             <input style="width:500px" type="text" class="" id="apikey" name="apikey"
                                                 value="{{ $item->apikey }}" required>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td style="width:150px">{{ $item->provider == 'NexusGGR' ? 'Agent Token' : 'Secret Key' }}</td>
+                                        <td style="width:150px">
+                                            {{ $item->provider == 'NexusGGR' ? 'Agent Token' : 'Secret Key' }}</td>
                                         <td colspan="3">
                                             <input style="width:500px" type="text" class="" id="secretkey"
                                                 name="secretkey" value="{{ $item->secretkey }}" required>
                                         </td>
                                     </tr>
                                     <tr {{ $item->provider == 'NexusGGR' ? '' : 'style="display:none;"' }}>
-                                        <td style="width:150px">{{ $item->provider == 'NexusGGR' ? 'Secret Key' : 'Agent Code' }}</td>
+                                        <td style="width:150px">
+                                            {{ $item->provider == 'NexusGGR' ? 'Secret Key' : 'Agent Code' }}</td>
                                         <td colspan="3">
                                             <input style="width:500px" type="text" class="" id="agentcode"
                                                 name="agentcode" value="{{ $item->agentcode }}" required>
