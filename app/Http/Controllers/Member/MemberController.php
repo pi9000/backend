@@ -231,4 +231,17 @@ class MemberController extends Controller
         $response = curl_post('new_member', $params, auth()->user()->brand_id);
         return response()->json($response);
     }
+
+        public function balance_settings(Request $request)
+    {
+        $params = [
+            'agent_id' => auth()->user()->agent_id,
+            'extplayer' => $request->id,
+            'action' => $request->type,
+            'amount' => $request->amount,
+            'transaction_by' => auth()->user()->username,
+        ];
+        $response = curl_post('update_balance', $params, auth()->user()->brand_id);
+        return redirect()->back()->with($response->status, $response->message);
+    }
 }
