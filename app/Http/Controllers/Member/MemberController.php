@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Member;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\CreditLog;
+use App\Models\Admin;
+use Illuminate\Support\Str;
 
 class MemberController extends Controller
 {
@@ -232,7 +235,7 @@ class MemberController extends Controller
         return response()->json($response);
     }
 
-        public function balance_settings(Request $request)
+    public function balance_settings(Request $request)
     {
         $params = [
             'agent_id' => auth()->user()->agent_id,
@@ -241,7 +244,44 @@ class MemberController extends Controller
             'amount' => $request->amount,
             'transaction_by' => auth()->user()->username,
         ];
+        $admin = Admin::find(auth()->user()->id);
         $response = curl_post('update_balance', $params, auth()->user()->brand_id);
+
+        if ($response->status != 'error') {
+            if ($request->type == 1) {
+                logActivity(auth()->user()->username, auth()->user()->agent_id, 'Member Balance', 'Deposit [ User : ' . $request->id . ' Amount : ' . $request->amount . ']', $request->ip());
+
+                $transaction = new CreditLog();
+                $transaction->agent_code = $admin->agent_code;
+                $transaction->agent_id = $admin->agent_id;
+                $transaction->username = $admin->username;
+                $transaction->transaction_id = Str::random(10);
+                $transaction->transaction_type = 'Debit';
+                $transaction->debit = $request->amount;
+                $transaction->balance = $admin->balance;
+                $transaction->note = 'Agent Withdraw Balance: [ ' . $admin->username . ' Amount : ' . $request->amount . ' ]';
+                $transaction->save();
+
+                $admin->balance -= $request->balance;
+                $admin->save();
+            } else {
+                logActivity(auth()->user()->username, auth()->user()->agent_id, 'Member Balance', 'Withdraw [ User : ' . $request->id . ' Amount : ' . $request->amount . ']', $request->ip());
+
+                $transaction = new CreditLog();
+                $transaction->agent_code = $admin->agent_code;
+                $transaction->agent_id = $admin->agent_id;
+                $transaction->username = $admin->username;
+                $transaction->transaction_id = Str::random(10);
+                $transaction->transaction_type = 'Debit';
+                $transaction->debit = $request->amount;
+                $transaction->balance = $admin->balance;
+                $transaction->note = 'Agent Deposit Balance: [ ' . $admin->username . ' Amount : ' . $request->amount . ' ]';
+                $transaction->save();
+
+                $admin->balance += $request->balance;
+                $admin->save();
+            }
+        }
         return redirect()->back()->with($response->status, $response->message);
     }
 }
