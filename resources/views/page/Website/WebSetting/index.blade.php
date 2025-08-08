@@ -350,21 +350,9 @@
                                                     <option value="style3" {{ $data->web->warna == 'style3' ? 'selected' :
                                                         ''}}> Dark Purple </option>
                                                     <option value="style4" {{ $data->web->warna == 'style4' ? 'selected' :
-                                                        ''}}> Ash </option>
+                                                        ''}}> Stake Grey </option>
                                                     <option value="style5" {{ $data->web->warna == 'style5' ? 'selected' :
-                                                        ''}}> Pink </option>
-                                                    <option value="style7" {{ $data->web->warna == 'style7' ? 'selected' :
-                                                        ''}}> Black </option>
-                                                    <option value="style14" {{ $data->web->warna == 'style14' ? 'selected' :
-                                                        ''}}> Red </option>
-                                                    <option value="style15" {{ $data->web->warna == 'style15' ? 'selected' :
-                                                        ''}}> Red2 </option>
-                                                    <option value="style25" {{ $data->web->warna == 'style25' ? 'selected' :
-                                                        ''}}> Brown </option>
-                                                    <option value="style10" {{ $data->web->warna == 'style10' ? 'selected' :
-                                                        ''}}> Black 2 </option>
-                                                    <option value="style30" {{ $data->web->warna == 'style30' ? 'selected' :
-                                                        ''}}> Pink 2 </option>
+                                                        ''}}> Black Gold </option>
                                                 </select>
                                             </div>
                                         </td>
