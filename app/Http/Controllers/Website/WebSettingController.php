@@ -67,6 +67,7 @@ class WebSettingController extends Controller
             'gateway_endpoint' => $request->gateway_endpoint,
             'telegram_chat_id' => $request->telegram_chat_id,
             'costum_script' => $request->costum_script,
+            'warna' => $request->web_styles,
         ];
         $data = curl_post_form('settings/website/update', $params, auth()->user()->brand_id);
         if ($data->status == 'error') {
