@@ -33,6 +33,7 @@ Route::namespace('Member')->middleware(['auth', 'verify'])->group(function () {
     Route::get('account_password_edit', 'MemberController@account_password_edit')->name('account_password_edit')->middleware('permission:sub_sidebar.Member Mgmt.New Member');
 
     Route::post('member_details/details', 'MemberController@member_details')->name('member_details')->middleware('permission:sub_sidebar.Member Mgmt.Account List');
+    Route::post('member_details/balance_settings', 'MemberController@balance_settings')->name('member_balance_settings')->middleware('permission:sub_sidebar.Member Mgmt.Account List');
     Route::post('member_details/bank_transaction_history', 'MemberController@bank_transaction_history')->name('bank_transaction_history')->middleware('permission:sub_sidebar.Member Mgmt.Account List');
     Route::post('getTransactionHistory/{id}', 'MemberController@transaction_history')->name('transaction_history')->middleware('permission:sub_sidebar.Member Mgmt.Account List');
     Route::post('member_details/game_statement', 'MemberController@game_statement')->name('game_statement')->middleware('permission:sub_sidebar.Member Mgmt.Account List');
