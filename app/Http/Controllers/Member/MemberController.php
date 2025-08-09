@@ -1,287 +1,237 @@
 <?php
 
-namespace App\Http\Controllers\Member;
+namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\CreditLog;
 use App\Models\Admin;
-use Illuminate\Support\Str;
+use App\Models\RequestOtp;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use App\Mail\TwoFactor;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Carbon;
+use App\Models\LoginHistory;
 
-class MemberController extends Controller
+class LoginController extends Controller
 {
-    public function index(Request $request)
+    public function showLoginForm()
     {
-        $pageTitle = "New Member";
-        return view('page.member.new_account', compact('pageTitle'));
+        session(['attemp' => 5]);
+
+        return view('auth.login');
     }
 
-    public function account_listing(Request $request)
+    public function verifyLogin()
     {
-        $pageTitle = "Account List";
-        return view('page.member.account_listing', compact('pageTitle'));
-    }
-
-    public function member_detail($id, Request $request)
-    {
-        $params = [
-            'agent_id' => auth()->user()->agent_id
-        ];
-        $data = curl_post('member_details/' . $id, $params, auth()->user()->brand_id);
-        if ($data->status != 1) {
-            return redirect()->back()->with('error', $data->message);
+        if (auth()->user()->login_verifed != 10) {
+            return redirect()->route('index');
         }
-        return view('page.member.details.details', compact('data'));
+        session(['attemp' => 5]);
+        return view('auth.verify');
     }
 
-    public function bank_transaction_history(Request $request)
+    public function login(Request $request)
     {
-        $params = [
-            'agent_id' => auth()->user()->agent_id
-        ];
-        $data = curl_post('member_details/' . $request->player_id, $params, auth()->user()->brand_id);
-        if ($data->status != 1) {
-            return redirect()->back()->with('error', $data->message);
+        $user = Admin::where('username', $request->u)->first();
+
+        if (Session::get('captcha') != $request->v) {
+            $s = 'f';
+            $a = session()->get('attemp');
+            $m = 'Invalid Captcha Validation.';
+        } elseif (empty($user)) {
+            $s = 'f';
+            $a = session()->get('attemp');
+            $m = 'Invalid  username or password.';
+        } elseif (!Hash::check($request->p, $user->password)) {
+            $attemp = session()->get('attemp');
+
+            if ($attemp == 0) {
+                session(['attemp' => 0]);
+                $s = 'f';
+                $a = $attemp;
+                $m = 'Account Locked.';
+
+                $user->status = 0;
+                $user->save();
+            } else {
+                if ($attemp == 0) {
+                    $attemps = 0;
+                } else {
+                    $attemps = $attemp - 1;
+                }
+
+                session(['attemp' => $attemps]);
+
+                $s = 'f';
+                $a = $attemps;
+                $m = 'Invalid  username or password.';
+            }
+
+            return response()->json([
+                's' => $s,
+                'm' => $m,
+                'attempt' => $a
+            ]);
+        } elseif ($user->status != 1) {
+            $s = 'f';
+            $m = 'Account Locked.';
+            $a = session()->get('attemp');
+
+            return response()->json([
+                's' => $s,
+                'm' => $m,
+                'attempt' => $a
+            ]);
+        } else {
+            session(['agent_request' => $user->agent_id]);
+
+            $s = 's';
+            $m = view('auth.secure-pin-code')->render();
+            $a = session()->get('attemp');
+            $ag = session()->get('agent_request');
+
+            return response()->json([
+                's' => $s,
+                'sp' => $m,
+                'agent' => $ag,
+                'fa_enable' => 'true',
+                'attempt' => $a
+            ]);
         }
-        return view('page.member.details.transaction', compact('data'));
     }
 
-    public function transaction_history($id, Request $request)
+    public function second_password(Request $request)
     {
-        $params = [
-            'agent_id' => auth()->user()->agent_id,
-            'daterange' => $request->daterange,
-        ];
-        $data = curl_post('transaction_history/' . $id, $params, auth()->user()->brand_id);
-        if ($data->status != 1) {
-            return redirect()->back()->with('error', $data->message);
+        $user = Admin::where('agent_id', session()->get('agent_request'))->first();
+
+        if (empty($user)) {
+            $response = [
+                's' => 'f',
+                'm' => 'Invalid Secure PinCode !'
+            ];
+        } elseif (!Hash::check(implode('', $request->pincode), $user->secure_pin)) {
+            $response = [
+                's' => 'f',
+                'm' => 'Invalid Secure PinCode !'
+            ];
+        } else {
+            $user->login_verifed = 1;
+            $user->save();
+            Auth::login($user);
+            $otp = new RequestOtp();
+            $otp->agent_code = auth()->user()->parent;
+            $otp->user_id = auth()->user()->id;
+            $otp->code = rand(100000, 999999);
+            $otp->action = 'auth';
+            $otp->ip_address = $request->ip();
+            $otp->expired_at = Carbon::now()->addMinutes(5);
+            $otp->save();
+
+            Mail::to($user->email)->queue(new TwoFactor(setting()->brand_name,setting()->logo,$user->username, $user->agent_id, $otp->code,env('MAIL_FROM_ADDRESS')));
+            $response = [
+                's' => 'request_otp',
+                'm' => 'request_otp'
+            ];
         }
-        return view('page.member.details.transaction_list', compact('data'));
+
+        return response()->json($response);
     }
 
-    public function member_details(Request $request)
+    public function logout(Request $request)
     {
-        $params = [
-            'agent_id' => auth()->user()->agent_id
-        ];
-        $data = curl_post('member_details/' . $request->player_id, $params, auth()->user()->brand_id);
-        return view('page.member.details.member_detail', compact('data'));
+        $user = Admin::find(auth()->user()->id);
+        $user->last_logout_time = Carbon::now();
+        $user->save();
+        Auth::logout($user);
+
+        return redirect('/');
     }
 
-    public function game_statement(Request $request)
+    public function verifyCode(Request $request)
     {
-        $params = [
-            'agent_id' => auth()->user()->agent_id
-        ];
-        $data = curl_post('member_details/' . $request->player_id, $params, auth()->user()->brand_id);
-        return view('page.member.details.game_statement', compact('data'));
-    }
+        $user = Admin::find(auth()->user()->id);
 
-    public function get_game_statement(Request $request)
-    {
-        $params = [
-            'agent_id' => auth()->user()->agent_id
-        ];
-        $data = curl_post('member_details/' . $request->player_id, $params, auth()->user()->brand_id);
-        return view('page.member.details.get_game_statement', compact('data'));
-    }
+        $check = RequestOtp::where('user_id',auth()->user()->id)->where('action','auth')->where('status',0)->latest()->first();
 
-    public function get_balance_info(Request $request)
-    {
-        $params = [
-            'agent_id' => auth()->user()->agent_id
-        ];
-        $data = curl_post('member_details/' . $request->player_id . '/balance', $params, auth()->user()->brand_id);
-        return $data;
-    }
+        if (empty($check)) {
+            $s = 0;
+            $m = 'Code expired,please resend code.';
+        } else if ($request->otp != $check->code) {
 
-    public function update_provider(Request $request)
-    {
-        $params = [
-            'agent_id' => auth()->user()->agent_id,
-            'player_id' => $request->player_id,
-            'mega888_id' => $request->mega888_id,
-            'mega888_password' => $request->mega888_password,
-            's918kiss_id' => $request->s918kiss_id,
-            's918kiss_password' => $request->s918kiss_password,
-            'pussy888_id' => $request->pussy888_id,
-            'pussy888_password' => $request->pussy888_password,
-        ];
-        $data = curl_post('update_provider', $params, auth()->user()->brand_id);
-        logActivity(auth()->user()->username, auth()->user()->agent_id, 'Update Game APK', 'Agent Update Game APK: [ ' . json_encode($params) . ' ]', $request->ip());
-        return $data;
-    }
+            $attemp = session()->get('attemp');
 
-    public function update_bank(Request $request)
-    {
-        $params = [
-            'agent_id' => auth()->user()->agent_id,
-            'player_id' => $request->player_id,
-            'bankname' => $request->bank_name,
-            'accno' => $request->accno,
-            'accname' => $request->accname,
-        ];
-        $data = curl_post('update_bank_user', $params, auth()->user()->brand_id);
-        logActivity(auth()->user()->username, auth()->user()->agent_id, 'Update Bank', 'Agent Update Bank: [ ' . json_encode($params) . ' ]', $request->ip());
-        return $data;
-    }
+            if ($attemp == 0) {
+                session(['attemp' => 0]);
+                $s = 2;
+                $a = $attemp;
+                $m = 'Too many attempts, account blocked';
 
-    public function update_account_data(Request $request)
-    {
-        $params = [
-            'agent_id' => auth()->user()->agent_id,
-            'player_id' => $request->player_id,
-            'account_name' => $request->account_name,
-            'mobile' => $request->mobile,
-            'old_mobile' => $request->old_mobile,
-        ];
-        $data = curl_post('update_account_data', $params, auth()->user()->brand_id);
-        logActivity(auth()->user()->username, auth()->user()->agent_id, 'Update Data', 'Agent Update Data: [ ' . json_encode($params) . ' ]', $request->ip());
-        return $data;
-    }
+                $user->status = 0;
+                $user->save();
+                Auth::logout($user);
+            } else {
 
-    public function update_account_remark(Request $request)
-    {
-        $params = [
-            'agent_id' => auth()->user()->agent_id,
-            'player_id' => $request->player_id,
-            'remark' => $request->remark,
-        ];
-        $data = curl_post('update_data_remark', $params, auth()->user()->brand_id);
-        logActivity(auth()->user()->username, auth()->user()->agent_id, 'Update Data', 'Agent Update Data: [ ' . json_encode($params) . ' ]', $request->ip());
-        return $data;
-    }
+                if ($attemp == 0) {
+                    $attemps = 0;
+                } else {
+                    $attemps = $attemp - 1;
+                }
 
-    public function account_listing_post(Request $request)
-    {
+                session(['attemp' => $attemps]);
 
-        $params = [
-            'agent_id' => auth()->user()->agent_id,
-            'all' => $request->all,
-            'form_select' => $request->form_select,
-            'created_at' => $request->created_at,
-            'user_name' => $request->user_name,
-            'player_remark' => $request->player_remark,
-            'user_mobile' => $request->user_mobile,
-            'user_account_number' => $request->user_account_number,
-            'user_bank_name' => $request->user_bank_name,
-            'status' => $request->status,
-            'rows' => $request->rows,
-            'sort_column' => $request->sort_column,
-            'sorting' => $request->sorting,
-            'page' => $request->page,
-        ];
+                $s = 4;
+                $a = $attemps;
+                $m = 'Invalid Code.';
+            }
 
-        $data = curl_post('account_listing', $params, auth()->user()->brand_id);
-        return view('page.member.account_list', compact('data'));
-    }
+            return response()->json([
+                'status' => $s,
+                'message' => $m,
+                'otp_attempt' => $a
+            ]);
 
-    public function account_password_edit(Request $request)
-    {
-        return view('page.member.account_password', [
-            'id' => $request->id,
-            'agent_id' => $request->agent_id,
-            'user_name' => $request->user_name,
+        } else if ($check->expired_at < Carbon::now()) {
+            $check->delete();
+            $s = 0;
+            $m = 'Code expired, please resend code.';
+        } else {
+            $user->last_login_ip = $request->ip();
+            $user->last_login_time = Carbon::now();
+            $user->last_logout_time = Carbon::now();
+            $user->login_verifed = 1;
+            $check->delete();
+            $user->save();
+            $s = 1;
+            $m = 'Success';
+        }
+
+        $loginHistory = new LoginHistory();
+        $loginHistory->agent_id = $user->id;
+        $loginHistory->ip_address = $request->ip();
+        $loginHistory->country = geoLocation($request->ip())->country . ' / ' . geoLocation($request->ip())->city;
+        $loginHistory->login_time = Carbon::now();
+        $loginHistory->save();
+
+        return response()->json([
+            'status' => $s,
+            'message' => $m
         ]);
     }
 
-    public function account_password_edit_post(Request $request)
+    public function verifyCodeResend(Request $request)
     {
-        $params = [
-            'id' => $request->id,
-            'agent_id' => $request->agent_id,
-            'player_password' => $request->player_password,
-        ];
-
-        logActivity(auth()->user()->username, auth()->user()->agent_id, 'Change Password', 'Agent changed password for member ID: ' . $request->user_name, $request->ip());
-
-        $response = curl_post('account_password_edit', $params, auth()->user()->brand_id);
-        return response()->json($response);
-    }
-
-    public function update_account_listing(Request $request)
-    {
-        $params = [
-            'player_id' => $request->player_id,
-            'agent_id' => auth()->user()->agent_id,
-            'firstname' => $request->firstname,
-            'game_status' => $request->suspend,
-            'status' => $request->status,
-            'old_mobile_' => $request->old_mobile,
-            'mobile' => $request->mobile,
-        ];
-
-        $response = curl_post('update_account_listing', $params, auth()->user()->brand_id);
-        logActivity(auth()->user()->username, auth()->user()->agent_id, 'Update Member', 'Agent Update [' . json_encode($params) . ']', $request->ip());
-        return response()->json($response);
-    }
-
-    public function new_member(Request $request)
-    {
-        if ($request->pwd !== $request->pwd_com) {
-            return response()->json(['status' => 'error', 'message' => 'Passwords do not match.'], 200);
-        }
-        $params = [
-            'username' => $request->username,
-            'agent_id' => auth()->user()->agent_id,
-            'password' => $request->pwd_com,
-            'phone' => $request->mobile,
-            'remark' => $request->remark,
-            'verified' => $request->verified,
-            'ref_id' => $request->ref_id,
-        ];
-        logActivity(auth()->user()->username, auth()->user()->agent_id, 'Create Member', 'Agent Create [' . json_encode($params) . ']', $request->ip());
-        $response = curl_post('new_member', $params, auth()->user()->brand_id);
-        return response()->json($response);
-    }
-
-    public function balance_settings(Request $request)
-    {
-        $params = [
-            'agent_id' => auth()->user()->agent_id,
-            'extplayer' => $request->id,
-            'action' => $request->type,
-            'amount' => $request->amount,
-            'transaction_by' => auth()->user()->username,
-        ];
-        $admin = Admin::find(auth()->user()->id);
-        $response = curl_post('update_balance', $params, auth()->user()->brand_id);
-
-        if ($response->status != 'error') {
-            if ($request->type == 1) {
-                logActivity(auth()->user()->username, auth()->user()->agent_id, 'Member Balance', 'Deposit [ User : ' . $request->id . ' Amount : ' . $request->amount . ']', $request->ip());
-
-                $transaction = new CreditLog();
-                $transaction->agent_code = $admin->agent_code;
-                $transaction->agent_id = $admin->agent_id;
-                $transaction->username = $admin->username;
-                $transaction->transaction_id = Str::random(10);
-                $transaction->transaction_type = 'Debit';
-                $transaction->debit = $request->amount;
-                $transaction->balance = $admin->balance;
-                $transaction->note = 'Agent Withdraw Balance: [ ' . $admin->username . ' Amount : ' . $request->amount . ' ]';
-                $transaction->save();
-
-                $admin->balance -= $request->balance;
-                $admin->save();
-            } else {
-                logActivity(auth()->user()->username, auth()->user()->agent_id, 'Member Balance', 'Withdraw [ User : ' . $request->id . ' Amount : ' . $request->amount . ']', $request->ip());
-
-                $transaction = new CreditLog();
-                $transaction->agent_code = $admin->agent_code;
-                $transaction->agent_id = $admin->agent_id;
-                $transaction->username = $admin->username;
-                $transaction->transaction_id = Str::random(10);
-                $transaction->transaction_type = 'Debit';
-                $transaction->debit = $request->amount;
-                $transaction->balance = $admin->balance;
-                $transaction->note = 'Agent Deposit Balance: [ ' . $admin->username . ' Amount : ' . $request->amount . ' ]';
-                $transaction->save();
-
-                $admin->balance += $request->balance;
-                $admin->save();
-            }
-        }
-        return redirect()->back()->with($response->status, $response->message);
+        $user = Admin::find(auth()->user()->id);
+        $check = RequestOtp::where('user_id',auth()->user()->id)->where('action','auth')->where('status',0)->latest()->first();
+        $check->code = rand(100000, 999999);
+        $check->expired_at = Carbon::now()->addMinutes(5);
+        $check->save();
+        Mail::to($user->email)->queue(new TwoFactor(setting()->brand_name,setting()->logo,$user->username, $user->agent_id, $check->code,env('MAIL_FROM_ADDRESS'),));
+        return response()->json([
+            'status' => 1,
+            'message' => 'OTP has been send to your email'
+        ]);
     }
 }
