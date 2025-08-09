@@ -17,7 +17,7 @@ class TwoFactor
      */
     public function handle(Request $request, Closure $next, string ...$guards): Response
     {
-        if (auth()->check() && auth()->user()->login_verifed != 10) {
+        if (auth()->check() && auth()->user()->login_verifed == 10) {
             return redirect('request_otp');
         }
 
