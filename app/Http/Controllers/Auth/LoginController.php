@@ -26,7 +26,7 @@ class LoginController extends Controller
 
     public function verifyLogin()
     {
-        if (auth()->user()->login_verifed == 1) {
+        if (auth()->user()->login_verifed != 10) {
             return redirect()->route('index');
         }
         session(['attemp' => 5]);
@@ -118,7 +118,7 @@ class LoginController extends Controller
                 'm' => 'Invalid Secure PinCode !'
             ];
         } else {
-            $user->login_verifed = 0;
+            $user->login_verifed = 1;
             $user->save();
             Auth::login($user);
             $otp = new RequestOtp();
@@ -228,7 +228,7 @@ class LoginController extends Controller
         $check->code = rand(100000, 999999);
         $check->expired_at = Carbon::now()->addMinutes(5);
         $check->save();
-        // Mail::to($user->email)->queue(new TwoFactor(setting()->brand_name,setting()->logo,$user->username, $user->agent_id, $check->code,env('MAIL_FROM_ADDRESS'),));
+        Mail::to($user->email)->queue(new TwoFactor(setting()->brand_name,setting()->logo,$user->username, $user->agent_id, $check->code,env('MAIL_FROM_ADDRESS'),));
         return response()->json([
             'status' => 1,
             'message' => 'OTP has been send to your email'
