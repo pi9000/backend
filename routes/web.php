@@ -165,7 +165,6 @@ Route::controller('LuckySpinController')->middleware(['auth', 'verify'])->group(
     Route::get('luckyspin_prize_settings', 'prize_index')->name('luckyspin_prize_settings');
     Route::get('luckyspin_prize_settings/create', 'prize_create')->name('luckyspin_prize_settings.create');
     Route::get('luckyspin_update', 'prize_delete')->name('prize_delete');
-
     Route::post('luckyspin_settings_create', 'prize_create_new')->name('prize_delete');
 });
 
