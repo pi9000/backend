@@ -340,7 +340,7 @@
                     $('.pincodesubmit').removeAttr('disabled');
                     return false;
                 } else if (d.s === 'request_otp') {
-                    location.href = '/request_otp';
+                    location.href = '/dashboard';
                     return;
                 } else if (d.s === 'l') {
                     toastMessage('Suspended', d.m, '#ff6849', 'error');

@@ -119,18 +119,19 @@ class LoginController extends Controller
             ];
         } else {
             $user->login_verifed = 1;
+            $user->last_login_ip = $request->ip();
+            $user->last_login_time = Carbon::now();
+            $user->last_logout_time = Carbon::now();
             $user->save();
             Auth::login($user);
-            $otp = new RequestOtp();
-            $otp->agent_code = auth()->user()->parent;
-            $otp->user_id = auth()->user()->id;
-            $otp->code = rand(100000, 999999);
-            $otp->action = 'auth';
-            $otp->ip_address = $request->ip();
-            $otp->expired_at = Carbon::now()->addMinutes(5);
-            $otp->save();
+            $loginHistory = new LoginHistory();
+            $loginHistory->agent_id = $user->id;
+            $loginHistory->ip_address = $request->ip();
+            $loginHistory->country = geoLocation($request->ip())->country . ' / ' . geoLocation($request->ip())->city;
+            $loginHistory->login_time = Carbon::now();
+            $loginHistory->save();
 
-            Mail::to($user->email)->queue(new TwoFactor(setting()->brand_name,setting()->logo,$user->username, $user->agent_id, $otp->code,env('MAIL_FROM_ADDRESS')));
+            // Mail::to($user->email)->queue(new TwoFactor(setting()->brand_name,setting()->logo,$user->username, $user->agent_id, $otp->code,env('MAIL_FROM_ADDRESS')));
             $response = [
                 's' => 'request_otp',
                 'm' => 'request_otp'
@@ -154,7 +155,7 @@ class LoginController extends Controller
     {
         $user = Admin::find(auth()->user()->id);
 
-        $check = RequestOtp::where('user_id',auth()->user()->id)->where('action','auth')->where('status',0)->latest()->first();
+        $check = RequestOtp::where('user_id', auth()->user()->id)->where('action', 'auth')->where('status', 0)->latest()->first();
 
         if (empty($check)) {
             $s = 0;
@@ -192,7 +193,6 @@ class LoginController extends Controller
                 'message' => $m,
                 'otp_attempt' => $a
             ]);
-
         } else if ($check->expired_at < Carbon::now()) {
             $check->delete();
             $s = 0;
@@ -202,6 +202,7 @@ class LoginController extends Controller
             $user->last_login_time = Carbon::now();
             $user->last_logout_time = Carbon::now();
             $user->login_verifed = 1;
+            $user->save();
             $check->delete();
             $user->save();
             $s = 1;
@@ -224,11 +225,11 @@ class LoginController extends Controller
     public function verifyCodeResend(Request $request)
     {
         $user = Admin::find(auth()->user()->id);
-        $check = RequestOtp::where('user_id',auth()->user()->id)->where('action','auth')->where('status',0)->latest()->first();
+        $check = RequestOtp::where('user_id', auth()->user()->id)->where('action', 'auth')->where('status', 0)->latest()->first();
         $check->code = rand(100000, 999999);
         $check->expired_at = Carbon::now()->addMinutes(5);
         $check->save();
-        Mail::to($user->email)->queue(new TwoFactor(setting()->brand_name,setting()->logo,$user->username, $user->agent_id, $check->code,env('MAIL_FROM_ADDRESS'),));
+        Mail::to($user->email)->queue(new TwoFactor(setting()->brand_name, setting()->logo, $user->username, $user->agent_id, $check->code, env('MAIL_FROM_ADDRESS'),));
         return response()->json([
             'status' => 1,
             'message' => 'OTP has been send to your email'

@@ -102,6 +102,16 @@
                                             href="/game_control">3.4
                                             Game Controll </a>
                                     </li>
+
+                                    <li class="dropdown-item waves-effect waves-light"><a class=""
+                                            href="/luckyspin_settings">3.5
+                                            Luckyspin Settings </a>
+                                    </li>
+
+                                    <li class="dropdown-item waves-effect waves-light"><a class=""
+                                            href="/luckyspin_prize_settings">3.6
+                                            Luckyspin Prize Settings </a>
+                                    </li>
                                 </ul>
                             </li>
                         @endif
