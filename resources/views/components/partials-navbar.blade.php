@@ -148,7 +148,7 @@
                                         </li>
 
                                         <li>
-                                            <a class="nav-link py-1 text-center" href="/action_logs">
+                                            <a class="nav-link py-1 text-center" href="/action_logs" style="display:none;">
                                                 <strong>@lang('nav.__action')</strong> <span
                                                     class="badge badge-pill badge-danger font-weight-bold"
                                                     id="__action"></span>
