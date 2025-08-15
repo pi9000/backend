@@ -69,6 +69,12 @@
                                                 href="/member_summary">2.2 Member Summary </a></li>
                                     @endif
 
+                                    @if (auth()->user()->hasPermission('sub_sidebar.Report.*'))
+                                        <li class="dropdown-item waves-effect waves-light"><a class=""
+                                                href="/action_logs">2.3
+                                                Acticity Log </a></li>
+                                    @endif
+
                                     @if (auth()->user()->hasPermission('sub_sidebar.Report.Win/Lose'))
                                         <li class="dropdown-item waves-effect waves-light"><a class=""
                                                 href="/game_summary">2.4
