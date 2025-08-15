@@ -36,7 +36,7 @@ class HomeController extends Controller
         return response()->json([
             'instant_withd' => $data->instant_wd ?? 0,
             'balance' => currencyFormat(auth()->user()->balance, 0),
-            'actions' => $actions,
+            'actions' => 0,
             'instant_depo' => $data->instant_depo ?? 0,
         ]);
     }
