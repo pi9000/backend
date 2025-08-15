@@ -61,7 +61,7 @@
                                 <tr>
                                     <td class="text-center">{{ $loop->iteration }}</td>
                                     <td class="text-center">
-                                        {{ date('Y-m-d 23:59:59', strtotime($item->created_at)) }}
+                                        {{ date('Y-m-d H:i:s', strtotime($item->created_at)) }}
                                     </td>
                                     <td class="text-center">
                                         <a href="{{ url('transactions/instant_transaction/' . $item->trx_id) }}"
